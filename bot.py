@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
-COGS = ["cogs.dice"]
+COGS = ["cogs.dice", "cogs.sheet"]
 
 
 class Chummer(commands.Bot):

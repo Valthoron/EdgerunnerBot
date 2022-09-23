@@ -128,4 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# OS stuff
+Thumbs.db
+.DS_Store
+
 # Project-specific files
+google-edgerunner.json
