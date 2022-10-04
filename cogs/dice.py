@@ -1,5 +1,7 @@
 import random
 
+from game.dice import roll, CriticalType
+
 from discord.ext import commands
 
 
@@ -19,28 +21,16 @@ class Dice(commands.Cog):
         else:
             label_text = " ".join(label)
 
-        roll = random.choice(range(1, 11))
-        total = roll + bonus
-        crit_text = ""
-        flavor_text = None
-
-        if roll == 10:
-            crit_roll = random.choice(range(1, 11))
-            total += crit_roll
-            crit_text = f" + 1d10 ({crit_roll})"
-            flavor_text = ":boom: *Critical Success!*"
-        elif roll == 1:
-            crit_roll = random.choice(range(1, 11))
-            total -= crit_roll
-            crit_text = f" - 1d10 ({crit_roll})"
-            flavor_text = ":thumbsdown: *Critical Failure!*"
+        roll_result = roll(bonus)
 
         response = f"{context.author.mention} :game_die:\n"
-        response += f"**{label_text}**: 1d10 ({roll}) + {bonus}{crit_text}\n"
-        response += f"**Total**: {total}\n"
+        response += f"**{label_text}**: {roll_result.dice_string()}\n"
+        response += f"**Total**: {roll_result.total}\n"
 
-        if flavor_text is not None:
-            response += flavor_text
+        if roll_result.critical_type is CriticalType.SUCCESS:
+            response += ":boom: *Critical Success!*"
+        elif roll_result.critical_type is CriticalType.FAILURE:
+            response += ":thumbsdown: *Critical Failure!*"
 
         await context.send(response)
 

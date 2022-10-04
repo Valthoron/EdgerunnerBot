@@ -4,119 +4,72 @@ import random
 from enum import IntEnum
 
 
-class GlitchType(IntEnum):
+class CriticalType(IntEnum):
     NONE = 0
-    GLITCH = 1
-    CRITICAL = 2
+    SUCCESS = 1
+    FAILURE = 2
 
 
 class RollResult:
-    def __init__(self, dice: list, hits: int, ones: int, glitch_type: GlitchType):
-        self._dice = dice
-        self._hits = hits
-        self._ones = ones
-        self._glitch_type = glitch_type
+    def __init__(self, roll: int, bonus: int, critical_roll: int = 0):
+        self._roll = roll
+        self._bonus = bonus
+        self._total = roll + bonus
+        self._critical_roll = critical_roll
+
+        if roll == 10:
+            self._critical_type = CriticalType.SUCCESS
+            self._total += critical_roll
+        elif roll == 1:
+            self._critical_type = CriticalType.FAILURE
+            self._total -= critical_roll
+        else:
+            self._critical_type = CriticalType.NONE
 
     @property
-    def dice(self) -> list:
-        return self._dice
+    def roll(self) -> int:
+        return self._roll
 
     @property
-    def dice_count(self) -> int:
-        return len(self._dice)
+    def bonus(self) -> int:
+        return self._bonus
 
     @property
-    def hits(self) -> int:
-        return self._hits
+    def total(self) -> int:
+        return self._total
 
     @property
-    def ones(self) -> int:
-        return self._ones
+    def critical_type(self) -> CriticalType:
+        return self._critical_type
 
     @property
-    def glitch_type(self) -> GlitchType:
-        return self._glitch_type
-
-    def __iter__(self) -> int:
-        for die in self._dice:
-            yield die
-
-    def __getitem__(self, index: int) -> int:
-        return self._dice[index]
+    def critical_roll(self) -> int:
+        return self._critical_roll
 
     def __str__(self) -> str:
-        string = f"{self.dice_count} "
-        string += "(" + self.dice_string() + ")"
-        string += f" -> `{self._hits}`"
-
+        string = self.dice_string()
+        string += f" = `{self._total}`"
         return string
 
     def dice_string(self) -> str:
-        die_string = []
+        string = f"1d10 ({self._roll}) + {self._bonus}"
 
-        for die in self._dice:
-            if die > 4:
-                die_string.append(f"**{die}**")
-            elif die == 1:
-                die_string.append(f"~~{die}~~")
+        if self._critical_type is not CriticalType.NONE:
+            if self._critical_type is CriticalType.SUCCESS:
+                string += " + "
             else:
-                die_string.append(f"{die}")
+                string += " - "
 
-        return ", ".join(die_string)
+            string += f"1d10 ({self._critical_roll})"
 
-
-def roll(count: int) -> RollResult:
-    if count < 1:
-        return None
-
-    if count > 200:
-        return None
-
-    dice = [
-        random.choice(range(1, 7))
-        for _ in range(count)
-    ]
-
-    count_hits = 0
-    count_ones = 0
-    glitch_threshold = math.ceil(count / 2)
-
-    for roll in dice:
-        if roll > 4:
-            count_hits += 1
-        elif 1 == roll:
-            count_ones += 1
-
-    glitch = False
-    critical_glitch = False
-
-    if count_ones >= glitch_threshold:
-        glitch = True
-
-        if count_hits == 0:
-            critical_glitch = True
-
-    # Form result object
-    glitch_type = GlitchType.NONE
-
-    if critical_glitch:
-        glitch_type = GlitchType.CRITICAL
-    elif glitch:
-        glitch_type = GlitchType.GLITCH
-
-    result = RollResult(dice, count_hits, count_ones, glitch_type)
-
-    return result
+        return string
 
 
-def roll_d6(count: int) -> tuple[int, list[int]]:
-    dice = [
-        random.choice(range(1, 7))
-        for _ in range(count)
-    ]
+def roll(bonus: int) -> RollResult:
+    roll = random.choice(range(1, 11))
+    crit_roll = 0
 
-    total = 0
-    for die in dice:
-        total += die
+    if (roll == 10) or (roll == 1):
+        crit_roll = random.choice(range(1, 11))
 
-    return total, dice
+    return RollResult(roll, bonus, crit_roll)
