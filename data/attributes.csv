@@ -1,0 +1,13 @@
+key;name;loc
+name;Name;B4
+handle;Handle;B7
+role;Role;B10
+role_ability;Role Ability;F10
+role_rank;Role Ability Rank;J10
+humanity;Humanity;B14
+humanity_max;Maximum Humanity;E14
+hp;Hit Points;G14
+hp_max;Maximum Hit Points;J14
+reputation;Reputation;B18
+improvement;Improvement Points;B22
+improvement_max;Maximum Improvement Points;E22

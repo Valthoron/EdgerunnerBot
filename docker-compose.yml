@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+    mongo:
+        image: mongo:4.4.11
+        container_name: edgerunner-mongo
+        restart: always
+        command: [ --auth ]
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=edgerunner
+        ports:
+            - 58027:27017
+        volumes:
+            - edgerunner-mongo-data:/data/db
+            - edgerunner-mongo-config:/data/configdb
+        networks:
+            - edgerunner-network
+
+    mongo-express:
+        image: mongo-express
+        container_name: edgerunner-mongo-express
+        restart: always
+        profiles:
+            - dev
+        depends_on:
+            - mongo
+        environment:
+            - ME_CONFIG_MONGODB_SERVER=mongo
+            - ME_CONFIG_MONGODB_PORT=27017
+            - ME_CONFIG_MONGODB_ENABLE_ADMIN=false
+            - ME_CONFIG_MONGODB_AUTH_DATABASE=edgerunner
+            - ME_CONFIG_MONGODB_AUTH_USERNAME=${MONGO_BOT_USER}
+            - ME_CONFIG_MONGODB_AUTH_PASSWORD=${MONGO_BOT_PASSWORD}
+            - ME_CONFIG_BASICAUTH_USERNAME=${MONGOEXPRESS_LOGIN}
+            - ME_CONFIG_BASICAUTH_PASSWORD=${MONGOEXPRESS_PASSWORD}
+        ports:
+            - 58081:8081
+        networks:
+            - edgerunner-network
+
+volumes:
+    edgerunner-mongo-data:
+        name: edgerunner-mongo-data
+    edgerunner-mongo-config:
+        name: edgerunner-mongo-config
+
+networks:
+    edgerunner-network:
+        driver: bridge
+        name: edgerunner-network

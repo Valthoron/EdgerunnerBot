@@ -1,0 +1,87 @@
+key;name;stat;loc;nameloc
+concentration;Concentration;will;U4;
+conceal;Conceal/Reveal Object;int;U5;
+lipreading;Lip Reading;int;U6;
+perception;Perception;int;U7;
+tracking;Tracking;int;U8;
+athletics;Athletics;dex;U10;
+contortionist;Contortionist;dex;U11;
+dance;Dance;dex;U12;
+endurance;Endurance;will;U13;
+resist;Resist Torture/Drugs;will;U14;
+stealth;Stealth;dex;U15;
+drive;Drive Land Vehicle;ref;U17;
+pilotair;Pilot Air Vehicle;ref;U18;
+pilotsea;Pilot Sea Vehicle;ref;U19;
+riding;Riding;ref;U20;
+accounting;Accounting;int;U22;
+animal;Animal Handling;int;U23;
+bureaucracy;Bureaucracy;int;U24;
+business;Business;int;U25;
+composition;Composition;int;U26;
+criminology;Criminology;int;U27;
+cryptography;Cryptgraphy;int;U28;
+deduction;Deduction;int;U29;
+education;Education;int;U30;
+gamble;Gamble;int;U31;
+streetslang;Language: Streetslang;int;U33;
+language_1;Language: *;int;U34;Q34
+language_2;Language: *;int;U35;Q35
+language_3;Language: *;int;U36;Q36
+library;Library Search;int;AB4;
+yourhome;Local Expert: Your Home;int;AB6;
+local_1;Local Expert: *;int;AB7;X7
+local_2;Local Expert: *;int;AB8;X8
+local_3;Local Expert: *;int;AB9;X9
+science_1;Science: *;int;AB11;X11
+science_2;Science: *;int;AB12;X12
+science_3;Science: *;int;AB13;X13
+science_4;Science: *;int;AB14;X14
+tactics;Tactics;int;AB15;
+wilderness;Wilderness Survival;int;AB16;
+brawling;Brawling;dex;AB18;
+evasion;Evasion;dex;AB19;
+martial_1;Martial Arts: *;dex;AB21;X21
+martial_2;Martial Arts: *;dex;AB22;X22
+martial_3;Martial Arts: *;dex;AB23;X23
+melee;Melee Weapon;dex;AB24;
+acting;Acting;cool;AB26;
+play_1;Play Instrument: *;tech;AB28;X28
+play_2;Play Instrument: *;tech;AB29;X29
+play_3;Play Instrument: *;tech;AB30;X30
+archery;Archert;ref;AB32;
+autofire;Autofire;ref;AB33;
+handgun;Handgun;ref;AB34;
+heavy;Heavy Weapons;ref;AB35;
+shoulder;Shoulder Arms;ref;AB36;
+bribery;Bribery;cool;AI4;
+conversation;Conversation;emp;AI5;
+human;Human Perception;emp;AI6;
+interrogation;Interrogation;cool;AI7;
+persuasion;Persuasion;cool;AI8;
+grooming;Personal Grooming;cool;AI9;
+streetwise;Streetwise;cool;AI10;
+trading;Trading;cool;AI11;
+wardrobe;Wardrobe & Style;cool;AI12;
+airtech;Air Vehicle Tech;tech;AI14;
+basictech;Basic Tech;tech;AI15;
+cybertech;Cybertech;tech;AI16;
+demolitions;Demolitions;tech;AI17;
+electronics;Electronics/Security Tech;tech;AI18;
+firstaid;First Aid;tech;AI19;
+forgery;Forgery;tech;AI20;
+landtech;Land Vehicle Tech;tech;AI21;
+paint;Paint/Draw/Sculpt;tech;AI22;
+paramedic;Paramedic;tech;AI23;
+photography;Photography/Film;tech;AI24;
+picklock;Pick Lock;tech;AI25;
+pickpocket;Pick Pocket;tech;AI26;
+seatech;Sea Vehicle Tech;tech;AI27;
+weaponstech;Weaponstech;tech;AI28;
+custom_1;*;;AI30;AD30
+custom_2;*;;AI31;AD31
+custom_3;*;;AI32;AD32
+custom_4;*;;AI33;AD33
+custom_5;*;;AI34;AD34
+custom_6;*;;AI35;AD35
+custom_7;*;;AI36;AD36

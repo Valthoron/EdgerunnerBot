@@ -1,0 +1,13 @@
+key;name;abbreviation;loc
+int;Intelligence;INT;L4
+ref;Reflex;REF;L7
+dex;Dexterity;DEX;L10
+tech;Technique;TECH;L13
+cool;Cool;COOL;L16
+will;Willpower;WILL;L19
+luck;Luck;LUCK;L22
+luck_max;Maximum Luck;MAXLUCK;N22
+move;Movement;MOVE;L25
+body;Body;BODY;L28
+emp;Empathy;EMP;L31
+emp_max;Maximum Empathy;MAXEMP;N31
