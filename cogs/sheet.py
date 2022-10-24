@@ -185,8 +185,8 @@ class Sheet(commands.Cog):
         embed.description = str(roll_result)
         embed.color = 0x00ff00
 
-        # if character.portrait:
-        #     embed.set_thumbnail(url=character.portrait)
+        if character.portrait:
+            embed.set_thumbnail(url=character.portrait)
 
         await context.send(embed=embed)
 

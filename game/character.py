@@ -43,8 +43,10 @@ class Character():
         self._skills = skills
         self._custom_skills = custom_skills
 
+        # Some common variables for quick access
         self._name = attributes["name"]
         self._handle = attributes["handle"]
+        self._portrait = attributes["portrait"]
 
     def __str__(self) -> str:
         return self._name
@@ -60,6 +62,10 @@ class Character():
     @property
     def handle(self) -> str:
         return self._handle
+
+    @property
+    def portrait(self) -> str:
+        return self._portrait
 
     @property
     def skills(self) -> dict[str, Skill]:
