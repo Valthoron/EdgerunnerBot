@@ -1,9 +1,9 @@
 import d20
 import discord
-import game.dice
 
 from discord.ext import commands
 from game.character import Character
+from game.dice import CriticalType, roll
 from game.gsheet import GoogleSheet
 from pymongo.collection import Collection
 from pymongo.results import UpdateResult
@@ -179,12 +179,17 @@ class Sheet(commands.Cog):
 
         skill = skill_list[0]
 
-        roll_result = game.dice.roll(skill.base)
+        roll_result = roll(skill.base)
 
         embed = discord.Embed()
         embed.title = f"{character.handle} makes {with_article(skill.name)} check!"
         embed.description = str(roll_result)
         embed.color = 0x00c000
+
+        if roll_result.critical_type is CriticalType.SUCCESS:
+            embed.description += "\n\n:boom: *Critical Success!*"
+        elif roll_result.critical_type is CriticalType.FAILURE:
+            embed.description += "\n\n:thumbsdown: *Critical Failure!*"
 
         if character.portrait:
             embed.set_thumbnail(url=character.portrait)
@@ -228,7 +233,7 @@ class Sheet(commands.Cog):
 
         attack = attack_list[0]
 
-        attack_roll_result = game.dice.roll(attack.total)
+        attack_roll_result = roll(attack.total)
         damage_roll_result = d20.roll(attack.damage)
 
         embed = discord.Embed()
@@ -236,6 +241,11 @@ class Sheet(commands.Cog):
         embed.description = "**Attack:** " + str(attack_roll_result)
         embed.description += "\n**Damage:** " + str(damage_roll_result)
         embed.color = 0xc00000
+
+        if attack_roll_result.critical_type is CriticalType.SUCCESS:
+            embed.description += "\n\n:boom: *Critical Success!*"
+        elif attack_roll_result.critical_type is CriticalType.FAILURE:
+            embed.description += "\n\n:thumbsdown: *Critical Failure!*"
 
         if character.portrait:
             embed.set_thumbnail(url=character.portrait)
