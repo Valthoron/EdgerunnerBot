@@ -45,9 +45,9 @@ class Dice(commands.Cog):
         response += f"**Total**: {roll_result.total}\n"
 
         if roll_result.critical_type is CriticalType.SUCCESS:
-            response += ":boom: *Critical Success!*"
+            response += ":boom: *Critical success!*"
         elif roll_result.critical_type is CriticalType.FAILURE:
-            response += ":thumbsdown: *Critical Failure!*"
+            response += ":thumbsdown: *Critical failure!*"
 
         await context.send(response)
 

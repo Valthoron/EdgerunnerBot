@@ -1,3 +1,5 @@
+import random
+
 import d20
 import discord
 
@@ -23,6 +25,27 @@ def get_article(noun: str) -> str:
 
 def with_article(noun: str) -> str:
     return f"{get_article(noun)} {noun}"
+
+
+def find_total_maximum(node) -> tuple[int, int]:
+    total = 0
+    maximum = 0
+
+    if type(node) is d20.expression.BinOp:
+        lefttotal, leftmaximum = find_total_maximum(node.left)
+        righttotal, rightmaximum = find_total_maximum(node.right)
+        total += lefttotal + righttotal
+        maximum += leftmaximum + rightmaximum
+    elif type(node) is d20.expression.UnOp:
+        optotal, opmaximum = find_total_maximum(node.operand)
+        total += optotal
+        maximum += opmaximum
+    elif type(node) is d20.expression.Dice:
+        dice: d20.expression.Dice = node
+        total += dice.total
+        maximum += dice.num * dice.size
+
+    return total, maximum
 
 
 class Sheet(commands.Cog):
@@ -136,7 +159,7 @@ class Sheet(commands.Cog):
         )
 
         if result is None:
-            await context.send(f"Could not find character \"{character_name}\". Please type in the full, exact name of the character to delete.")
+            await context.send(f"Could not find character \"{character_name}\". Please type the full, exact name of the character to delete.")
             return
 
         character_name = result["name"]
@@ -144,6 +167,7 @@ class Sheet(commands.Cog):
 
     @ commands.command(name="check", aliases=["ch", "skill", "sk"])
     async def skill_check(self, context: commands.Context, *skill_name):
+        # Load currently active character
         character_dict = await self._characters.find_one(
             {
                 "owner": context.author.id,
@@ -161,6 +185,7 @@ class Sheet(commands.Cog):
 
         character = Character.from_dict(character_dict)
 
+        # Find skill
         skill_name = " ".join(skill_name)
         skill_list = character.find_skill(skill_name)
 
@@ -179,25 +204,31 @@ class Sheet(commands.Cog):
 
         skill = skill_list[0]
 
+        # Perform skill check
         roll_result = roll(skill.base)
 
+        # Prepare response embed
         embed = discord.Embed()
         embed.title = f"{character.handle} makes {with_article(skill.name)} check!"
         embed.description = str(roll_result)
         embed.color = 0x00c000
 
-        if roll_result.critical_type is CriticalType.SUCCESS:
-            embed.description += "\n\n:boom: *Critical Success!*"
-        elif roll_result.critical_type is CriticalType.FAILURE:
-            embed.description += "\n\n:thumbsdown: *Critical Failure!*"
-
         if character.portrait:
             embed.set_thumbnail(url=character.portrait)
 
+        # Critical roll callout
+        if roll_result.critical_type is CriticalType.SUCCESS:
+            embed.description += "\n\n:boom: *Critical success!*"
+        elif roll_result.critical_type is CriticalType.FAILURE:
+            embed.description += "\n\n:thumbsdown: *Critical failure!*"
+
+        # Send response
         await context.send(embed=embed)
+        await context.message.delete()
 
     @ commands.command(name="attack", aliases=["a"])
     async def attack(self, context: commands.Context, *attack_name):
+        # Load currently active character
         character_dict = await self._characters.find_one(
             {
                 "owner": context.author.id,
@@ -215,6 +246,7 @@ class Sheet(commands.Cog):
 
         character = Character.from_dict(character_dict)
 
+        # Find attack
         attack_name = " ".join(attack_name)
         attack_list = character.find_attack(attack_name)
 
@@ -233,24 +265,40 @@ class Sheet(commands.Cog):
 
         attack = attack_list[0]
 
+        # Perform attack and damage roll
         attack_roll_result = roll(attack.total)
         damage_roll_result = d20.roll(attack.damage)
 
+        # Prepare response embed
         embed = discord.Embed()
         embed.title = f"{character.handle} makes {with_article(attack.name)} attack!"
         embed.description = "**Attack:** " + str(attack_roll_result)
         embed.description += "\n**Damage:** " + str(damage_roll_result)
         embed.color = 0xc00000
 
-        if attack_roll_result.critical_type is CriticalType.SUCCESS:
-            embed.description += "\n\n:boom: *Critical Success!*"
-        elif attack_roll_result.critical_type is CriticalType.FAILURE:
-            embed.description += "\n\n:thumbsdown: *Critical Failure!*"
-
         if character.portrait:
             embed.set_thumbnail(url=character.portrait)
 
+        # Critical roll callout
+        if attack_roll_result.critical_type is CriticalType.SUCCESS:
+            embed.description += "\n\n:boom: *Critical success!*"
+        elif attack_roll_result.critical_type is CriticalType.FAILURE:
+            embed.description += "\n\n:thumbsdown: *Critical failure!*"
+
+        # Nice damage callout
+        damage_total, damage_maximum = find_total_maximum(damage_roll_result.expr.roll)
+        if damage_total >= (0.8 * damage_maximum):
+            if attack_roll_result.critical_type is CriticalType.SUCCESS:
+                callout = random.choice(["BOOM SHAKALAKA", "IT'S ON FIRE", "SUCK ON THAT", "BITCHIN'", "SUPERCALIFRAGILISTICEXPIALIDOCIOUS"])
+                embed.description += f"\n\n:fire: *{callout}!*"
+            elif attack_roll_result.critical_type is CriticalType.FAILURE:
+                embed.description += "\n\n:eyes: *Nice damage, though...*"
+            else:
+                embed.description += "\n\n:gun: *Nice damage!*"
+
+        # Send response
         await context.send(embed=embed)
+        await context.message.delete()
 
 
 async def setup(bot):
