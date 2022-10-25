@@ -3,6 +3,8 @@ import csv
 attributes = {}
 stats = {}
 skills = {}
+attacks = {}
+
 batch_locs = {}
 batch_namelocs = {}
 
@@ -29,3 +31,9 @@ with open("data/skills.csv", newline="") as csvfile:
 
         if row["nameloc"]:
             batch_namelocs[row["nameloc"]] = key
+
+with open("data/attacks.csv", newline="") as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        key = row["key"].lower()
+        attacks[key] = row

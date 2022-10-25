@@ -1,7 +1,11 @@
+from pydoc import doc
+
 import gspread
 
-from game.character import Character, Skill
 import game.data
+import game.gsheetdata
+
+from game.character import Character, Skill
 
 
 class GoogleSheet:
@@ -10,63 +14,61 @@ class GoogleSheet:
 
     def load_character(self, url) -> Character:
         document = self.gsheet_service.open_by_url(url)
-        sheet = document.get_worksheet(0)
 
-        # Some stuff so that a single batch_get() can be used for everything
-        all_locs = list(game.data.batch_locs.keys())
-        all_locs.extend(list(game.data.batch_namelocs.keys()))
-        all_values = sheet.batch_get(all_locs)
-        index_attributes = 0
-        index_attributes_end = index_attributes + len(game.data.attributes)
-        index_stats = index_attributes_end
-        index_stats_end = index_stats + len(game.data.stats)
-        index_skills = index_stats_end
-        index_skills_end = index_skills + len(game.data.skills)
-        index_names = index_skills_end
-        index_names_end = index_names + len(game.data.batch_namelocs)
+        # Get all character data using a single batch call
+        sheet_data = {}
+        all_values = document.values_batch_get(game.gsheetdata.location_list)
+
+        for result in all_values["valueRanges"]:
+            loc = result["range"]
+            key = game.gsheetdata.location_dictionary[loc]
+
+            if "values" in result:
+                value = result["values"][0][0]
+            else:
+                value = ""  # Empty cell
+
+            sheet_data[key] = value
 
         # Parse attributes
         attributes = {}
 
-        for i in range(index_attributes, index_attributes_end):
-            key = game.data.batch_locs[all_locs[i]]
-            attributes[key] = all_values[i].first()
+        for key in game.data.attributes.keys():
+            attributes[key] = sheet_data[key]
 
         # Parse stats
         stats = {}
 
-        for i in range(index_stats, index_stats_end):
-            key = game.data.batch_locs[all_locs[i]]
-            stats[key] = all_values[i].first()
+        for key in game.data.stats.keys():
+            stats[key] = sheet_data[key]
 
         # Parse skills
         skills = {}
-        custom_skill_names = {}
-        custom_skill_keys = {}
+        custom_skills = {}
 
-        for i in range(index_names, index_names_end):
-            key = game.data.batch_namelocs[all_locs[i]]
-            if all_values[i]:
-                custom_skill_names[key] = all_values[i].first()
-
-                custom_key = "".join(all_values[i].first().lower().split())
-                custom_skill_keys[custom_key] = key
-
-        for i in range(index_skills, index_skills_end):
-            key = game.data.batch_locs[all_locs[i]]
+        for key in game.data.skills.keys():
             name = game.data.skills[key]["name"]
+            custom_name_key = key + "_name"
 
-            if game.data.skills[key]["nameloc"]:
-                if key in custom_skill_names:
-                    name = name.replace("*", custom_skill_names[key])
+            if custom_name_key in sheet_data:
+                custom_name = sheet_data[custom_name_key]
+                if custom_name:
+                    name = name.replace("*", custom_name)
+                    custom_skill_key = "".join(custom_name.lower().split())
+                    custom_skills[custom_skill_key] = key
                 else:
                     continue
 
-            skills[key] = Skill(name, int(all_values[i].first()))
+            if sheet_data[key]:
+                total = int(sheet_data[key])
+            else:
+                total = 0  # Empty cell is zero
+
+            skills[key] = Skill(name, total)
 
         # Create character object
         name = attributes["name"]
 
-        character = Character(document.id, attributes=attributes, stats=stats, skills=skills, custom_skills=custom_skill_keys)
+        character = Character(document.id, attributes=attributes, stats=stats, skills=skills, custom_skills=custom_skills)
 
         return character
