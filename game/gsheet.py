@@ -5,7 +5,7 @@ import gspread
 import game.data
 import game.gsheetdata
 
-from game.character import Character, Skill
+from game.character import Character, Skill, Attack
 
 
 class GoogleSheet:
@@ -60,15 +60,28 @@ class GoogleSheet:
                     continue
 
             if sheet_data[key]:
-                total = int(sheet_data[key])
+                base = int(sheet_data[key])
             else:
-                total = 0  # Empty cell is zero
+                base = 0  # Empty cell is zero
 
-            skills[key] = Skill(name, total)
+            skills[key] = Skill(name, base)
+
+        # Parse attacks
+        attacks = {}
+
+        for key in game.data.attacks.keys():
+            name = sheet_data[key + "_name"]
+            base = sheet_data[key + "_total"]
+            damage = sheet_data[key + "_damage"]
+
+            if not name or not base or not damage:
+                continue
+
+            attacks[key] = Attack(name, base, damage)
 
         # Create character object
         name = attributes["name"]
 
-        character = Character(document.id, attributes=attributes, stats=stats, skills=skills, custom_skills=custom_skills)
+        character = Character(document.id, attributes=attributes, stats=stats, skills=skills, custom_skills=custom_skills, attacks=attacks)
 
         return character
