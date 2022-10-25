@@ -1,3 +1,4 @@
+import d20
 import discord
 import game.dice
 
@@ -141,7 +142,7 @@ class Sheet(commands.Cog):
         character_name = result["name"]
         await context.send(f"Deleted character {character_name}.")
 
-    @ commands.command(name="check")
+    @ commands.command(name="check", aliases=["ch", "skill", "sk"])
     async def skill_check(self, context: commands.Context, *skill_name):
         character_dict = await self._characters.find_one(
             {
@@ -183,7 +184,58 @@ class Sheet(commands.Cog):
         embed = discord.Embed()
         embed.title = f"{character.handle} makes {with_article(skill.name)} check!"
         embed.description = str(roll_result)
-        embed.color = 0x00ff00
+        embed.color = 0x00c000
+
+        if character.portrait:
+            embed.set_thumbnail(url=character.portrait)
+
+        await context.send(embed=embed)
+
+    @ commands.command(name="attack", aliases=["a"])
+    async def attack(self, context: commands.Context, *attack_name):
+        character_dict = await self._characters.find_one(
+            {
+                "owner": context.author.id,
+                "active": True
+            }
+        )
+
+        if character_dict is None:
+            await context.send("Could not find currently active character.")
+            return
+
+        if not attack_name:
+            await context.send("Please specify attack name to make an attack.")
+            return
+
+        character = Character.from_dict(character_dict)
+
+        attack_name = " ".join(attack_name)
+        attack_list = character.find_attack(attack_name)
+
+        if len(attack_list) == 0:
+            await context.send(f"No attack found for \"{attack_name}\".")
+            return
+        elif len(attack_list) > 1:
+            response = f"Found multiple matching attacks for \"{attack_name}\":\n"
+
+            for attack in attack_list:
+                response += f"\u2022 {attack.name}\n"
+
+            response += "Please use a more specific name."
+            await context.send(response)
+            return
+
+        attack = attack_list[0]
+
+        attack_roll_result = game.dice.roll(attack.total)
+        damage_roll_result = d20.roll(attack.damage)
+
+        embed = discord.Embed()
+        embed.title = f"{character.handle} makes {with_article(attack.name)} attack!"
+        embed.description = "**Attack:** " + str(attack_roll_result)
+        embed.description += "\n**Damage:** " + str(damage_roll_result)
+        embed.color = 0xc00000
 
         if character.portrait:
             embed.set_thumbnail(url=character.portrait)

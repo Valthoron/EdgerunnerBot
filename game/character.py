@@ -86,6 +86,12 @@ class Character():
         self._handle = attributes["handle"]
         self._portrait = attributes["portrait"]
 
+        # Derived variables
+        self._attack_names = {}
+        for key, attack in self._attacks.items():
+            short_name = "".join(attack.name.lower().split())
+            self._attack_names[short_name] = key
+
     def __str__(self) -> str:
         return self._name
 
@@ -109,7 +115,7 @@ class Character():
     def skills(self) -> dict[str, Skill]:
         return self._skills
 
-    def find_skill(self, skill_name: str):
+    def find_skill(self, skill_name: str) -> list[Skill]:
         short_key = "".join(skill_name.split()).lower()
         key_matches = list(filter(lambda key: key.startswith(short_key), self._skills.keys()))
         skill_list = [self._skills[key] for key in key_matches]
@@ -120,6 +126,14 @@ class Character():
             skill_list = [self._skills[key] for key in intermediate_keys]
 
         return skill_list
+
+    def find_attack(self, attack_name: str) -> list[Attack]:
+        short_key = "".join(attack_name.split()).lower()
+        key_matches = list(filter(lambda key: key.startswith(short_key), self._attack_names.keys()))
+        attack_keys = [self._attack_names[key] for key in key_matches]
+        attack_list = [self._attacks[key] for key in attack_keys]
+
+        return attack_list
 
     # Serialization
     def to_dict(self) -> dict:
