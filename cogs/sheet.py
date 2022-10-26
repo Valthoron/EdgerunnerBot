@@ -60,7 +60,7 @@ class Sheet(commands.Cog):
             return
 
         # Load character from character sheet
-        character = GoogleSheet().load_character(url)
+        character = GoogleSheet().load_character_from_url(url)
 
         # Deactivate all existing characters
         await self._characters.update_many(
@@ -90,6 +90,63 @@ class Sheet(commands.Cog):
             response = f"Updated character sheet for {character.name}."
 
         await context.send(response)
+
+    @commands.command(name="update")
+    async def update_character(self, context: commands.Context, *character_name):
+        character_dict = {}
+
+        if not character_name:
+            # Use the currently active character
+            character_dict = await self._characters.find_one(
+                {
+                    "owner": context.author.id,
+                    "active": True
+                }
+            )
+
+            if character_dict is None:
+                await context.send("Could not find currently active character. Please activate one or specify character name.")
+                return
+        else:
+            # Find character by name
+            character_dict = await self._characters.find_one(
+                {
+                    "owner": context.author.id,
+                    "name": {"$regex": f"^{character_name}", "$options": "i"}
+                }
+            )
+
+            if character_dict is None:
+                await context.send(f"Could not find character \"{character_name}\".")
+                return
+
+        # Load character from character sheet
+        key = character_dict["cid"]
+        character = GoogleSheet().load_character_from_key(key)
+
+        # Deactivate all existing characters
+        await self._characters.update_many(
+            {
+                "owner": context.author.id
+            },
+            {
+                "$set": {"active": False}
+            }
+        )
+
+        # Upsert new character
+        result: UpdateResult = await self._characters.update_one(
+            {
+                "owner": context.author.id,
+                "cid": character.id
+            },
+            {
+                "$set": {"active": True} | character.to_dict()
+            },
+            upsert=True
+        )
+
+        await context.send(f"Updated character sheet for {character.name}.")
 
     @commands.command(name="character", aliases=["char", "activate"])
     async def activate_character(self, context: commands.Context, *character_name):

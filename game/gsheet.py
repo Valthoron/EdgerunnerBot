@@ -1,6 +1,7 @@
 from pydoc import doc
 
 import gspread
+import gspread.utils
 
 import game.data
 import game.gsheetdata
@@ -12,8 +13,12 @@ class GoogleSheet:
     def __init__(self):
         self.gsheet_service = gspread.service_account(filename="google-edgerunner.json")
 
-    def load_character(self, url) -> Character:
-        document = self.gsheet_service.open_by_url(url)
+    def load_character_from_url(self, url) -> Character:
+        key = gspread.utils.extract_id_from_url(url)
+        return self.load_character_from_key(key)
+
+    def load_character_from_key(self, key) -> Character:
+        document = self.gsheet_service.open_by_key(key)
 
         # Get all character data using a single batch call
         sheet_data = {}
