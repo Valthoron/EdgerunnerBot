@@ -1,6 +1,8 @@
 # Edgerunner Bot
 This is a Discord bot that helps with making rolls and using certain character abilities in the Cyberpunk RED TTRPG game.
 
+[![CodeFactor](https://www.codefactor.io/repository/github/valthoron/edgerunnerbot/badge)](https://www.codefactor.io/repository/github/valthoron/edgerunnerbot)
+
 Edgerunner Bot gets inspiration and uses snippets of code from [Avrae](https://avrae.io/), a great Discord bot with many features for playing Dungeons & Dragons 5th Edition online. It's also [open-source](https://github.com/avrae/avrae), go check it out!
 
 ## Dependencies
