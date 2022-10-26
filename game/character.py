@@ -65,7 +65,7 @@ class Attack():
     def from_dict(cls, dct) -> Attack:
         attack = cls(
             name=dct["name"],
-            base=int(dct["base"]),
+            total=int(dct["total"]),
             damage=dct["damage"]
         )
 
