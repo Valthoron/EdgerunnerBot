@@ -227,6 +227,45 @@ class Sheet(commands.Cog):
         character_name = result["name"]
         await context.send(f"Deleted character {character_name}.")
 
+    @ commands.command(name="initiative", aliases=["init"])
+    async def initiative_roll(self, context: commands.Context):
+        # Load currently active character
+        character_dict = await self._characters.find_one(
+            {
+                "owner": context.author.id,
+                "active": True
+            }
+        )
+
+        if character_dict is None:
+            await context.send("Could not find currently active character.")
+            return
+
+        character = Character.from_dict(character_dict)
+        reflex = int(character.stats["reflex"])
+
+        # Roll for initiative
+        roll_result = roll(reflex)
+
+        # Prepare response embed
+        embed = discord.Embed()
+        embed.title = f"{character.handle} rolls for initiative!"
+        embed.description = str(roll_result)
+        embed.color = 0x0080c0
+
+        if character.portrait:
+            embed.set_thumbnail(url=character.portrait)
+
+        # Critical roll callout
+        if roll_result.critical_type is CriticalType.SUCCESS:
+            embed.description += "\n\n:boom: *Critical success!*"
+        elif roll_result.critical_type is CriticalType.FAILURE:
+            embed.description += "\n\n:thumbsdown: *Critical failure!*"
+
+        # Send response
+        await context.send(embed=embed)
+        await context.message.delete()
+
     @ commands.command(name="check", aliases=["c", "ch", "skill", "sk"])
     async def skill_check(self, context: commands.Context, *skill_name):
         # Load currently active character

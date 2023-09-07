@@ -115,6 +115,10 @@ class Character():
         return self._portrait
 
     @property
+    def stats(self) -> dict[str, int]:
+        return self._stats
+
+    @property
     def skills(self) -> dict[str, Skill]:
         return self._skills
 
