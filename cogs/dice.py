@@ -1,6 +1,7 @@
 import d20
 
 from discord.ext import commands
+
 from game.dice import CriticalType, roll
 
 
@@ -24,9 +25,9 @@ class PersistentRollContext(d20.RollContext):
 
 class Dice(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self._bot: commands.Bot = bot
 
-    @commands.command(name="croll", aliases=["c"])
+    @commands.command(name="croll")
     async def croll(self, context: commands.Context, bonus: int | None = None, *label):
         response = f"{context.author.mention} :game_die:"
 

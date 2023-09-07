@@ -4,11 +4,13 @@ import d20
 import discord
 
 from discord.ext import commands
+from pymongo.collection import Collection
+from pymongo.results import UpdateResult
+
+from cogs.dice import Dice
 from game.character import Character
 from game.dice import CriticalType, roll
 from game.gsheet import GoogleSheet
-from pymongo.collection import Collection
-from pymongo.results import UpdateResult
 
 
 def get_article(noun: str) -> str:
@@ -50,7 +52,7 @@ def find_total_maximum(node) -> tuple[int, int]:
 
 class Sheet(commands.Cog):
     def __init__(self, bot):
-        self._bot = bot
+        self._bot: commands.Bot = bot
         self._characters: Collection = bot.mdb.characters
 
     @commands.command(name="import")
@@ -222,7 +224,7 @@ class Sheet(commands.Cog):
         character_name = result["name"]
         await context.send(f"Deleted character {character_name}.")
 
-    @ commands.command(name="check", aliases=["ch", "skill", "sk"])
+    @ commands.command(name="check", aliases=["c", "ch", "skill", "sk"])
     async def skill_check(self, context: commands.Context, *skill_name):
         # Load currently active character
         character_dict = await self._characters.find_one(
@@ -241,6 +243,13 @@ class Sheet(commands.Cog):
             return
 
         character = Character.from_dict(character_dict)
+
+        # Perform plain dice roll if skill name is integer instead
+        if skill_name[0].isnumeric():
+            skill_name = (int(skill_name[0]), *skill_name[1:])
+            dice: Dice = self._bot.cogs.get("Dice")
+            await dice.croll(context, *skill_name)
+            return
 
         # Find skill
         skill_name = " ".join(skill_name)

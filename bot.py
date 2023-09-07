@@ -2,14 +2,12 @@ import asyncio
 import os
 
 import discord
+import motor.motor_asyncio
 
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 from dotenv import load_dotenv
-
-import motor.motor_asyncio
 from pymongo.database import Database
-
 
 load_dotenv()
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
