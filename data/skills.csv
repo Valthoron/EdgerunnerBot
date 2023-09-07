@@ -1,4 +1,11 @@
 key,name,stat,loc,nameloc
+intelligence,Intelligence,,L4,
+reflex,Reflex,,L7,
+dexterity,Dexterity,,L10,
+technique,Technique,,L13,
+cool,Cool,,L16,
+willpower,Willpower,,L19,
+body,Body,,L28,
 concentration,Concentration,will,U4,
 conceal,Conceal/Reveal Object,int,U5,
 lipreading,Lip Reading,int,U6,
