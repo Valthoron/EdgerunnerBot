@@ -122,6 +122,9 @@ class Sheet(commands.Cog):
                 await context.send(f"Could not find character \"{character_name}\".")
                 return
 
+        # Send updating notification
+        message = await context.send(f"Updating {character_dict['name']}...")
+
         # Load character from character sheet
         key = character_dict["cid"]
         character = GoogleSheet().load_character_from_key(key)
@@ -148,7 +151,7 @@ class Sheet(commands.Cog):
             upsert=True
         )
 
-        await context.send(f"Updated character sheet for {character.name}.")
+        await message.edit(content=f"Updated character sheet for {character.name}.")
 
     @commands.command(name="character", aliases=["char", "activate"])
     async def activate_character(self, context: commands.Context, *character_name):
