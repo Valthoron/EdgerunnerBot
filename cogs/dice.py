@@ -31,7 +31,8 @@ class Dice(commands.Cog):
         response = f"{context.author.mention} :game_die:"
 
         if bonus is None:
-            bonus = 0
+            await context.send("Please specify bonus to make a roll.")
+            return
 
         if not label:
             label_text = "Dice"
