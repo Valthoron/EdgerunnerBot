@@ -86,6 +86,9 @@ class Character():
         self._handle = attributes["handle"]
         self._portrait = attributes["portrait"]
 
+        if len(self._handle) == 0:
+            self._handle = self._name
+
         # Derived variables
         self._attack_names = {}
         for key, attack in self._attacks.items():
