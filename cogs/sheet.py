@@ -268,6 +268,13 @@ class Sheet(commands.Cog):
 
     @ commands.command(name="check", aliases=["c", "ch", "skill", "sk"])
     async def skill_check(self, context: commands.Context, *skill_name):
+        # Perform plain dice roll if skill name is integer instead
+        if skill_name[0].isnumeric():
+            skill_name = (int(skill_name[0]), *skill_name[1:])
+            dice: Dice = self._bot.cogs.get("Dice")
+            await dice.croll(context, *skill_name)
+            return
+            
         # Load currently active character
         character_dict = await self._characters.find_one(
             {
@@ -285,13 +292,6 @@ class Sheet(commands.Cog):
             return
 
         character = Character.from_dict(character_dict)
-
-        # Perform plain dice roll if skill name is integer instead
-        if skill_name[0].isnumeric():
-            skill_name = (int(skill_name[0]), *skill_name[1:])
-            dice: Dice = self._bot.cogs.get("Dice")
-            await dice.croll(context, *skill_name)
-            return
 
         # Find skill
         skill_name = " ".join(skill_name)
